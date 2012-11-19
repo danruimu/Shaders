@@ -38,6 +38,7 @@ win32:INCLUDEPATH += C:/lib/glew-1.5.8/include/
 win32:LIBS += -LC:/lib/glew-1.5.8/lib
 win32:LIBS += -lglew32
 win32:LIBS += -L../bin/ -lcore
+unix:LIBS += -L /usr/lib/fglrx -lGL
 
 macx:LIBS +=  -L../bin/ -lGLEW -lcore -install_name $$DESTDIR/libpluginglwidget.dylib
 INSTALLS   += target

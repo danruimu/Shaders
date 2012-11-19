@@ -31,6 +31,7 @@ CONFIG(debug, debug|release) {
 unix: INCLUDEPATH += /assig/grau-g/glew/include/
 unix: LIBS += -L/assig/grau-g/glew/lib 
 unix: LIBS += -lGLEW
+unix: LIBS += -L /usr/lib/fglrx -lGL
 
 win32:INCLUDEPATH += C:/lib/glew-1.5.8/include/
 win32:LIBS += -LC:/lib/glew-1.5.8/lib
