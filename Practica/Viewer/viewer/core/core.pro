@@ -28,7 +28,6 @@ win32:INCLUDEPATH += C:/lib/glew-1.5.8/include/
 win32:LIBS += -LC:/lib/glew-1.5.8/lib
 win32:LIBS += -lglew32
 macx:LIBS += -lGLEW -install_name $$DESTDIR/libcore.dylib
-unix:LIBS += -L /usr/lib/fglrx -lGL
 
 HEADERS	+= include/*.h
 SOURCES	+= src/*.cpp
