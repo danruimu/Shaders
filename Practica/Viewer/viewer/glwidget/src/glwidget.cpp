@@ -84,7 +84,7 @@ void GLWidget::resizeGL (int width, int height)
 void GLWidget::loadPlugin()
 {
     // TO DO: canviar extensió segons OS
-    QStringList list = QFileDialog::getOpenFileNames(NULL, "Select one or more plugins to open", "../plugins/bin", "Plugins (*.dll *.so *.dylib)");
+    QStringList list = QFileDialog::getOpenFileNames(NULL, "Select one or more plugins to open", "../../plugins/bin", "Plugins (*.dll *.so *.dylib)");
     QStringList::Iterator it = list.begin();
     while(it != list.end()) 
     {
@@ -248,7 +248,7 @@ void GLWidget::addObjectFromFile(const QString& filename)
 
 void GLWidget::addObject()
 {
-    QStringList files = QFileDialog::getOpenFileNames(NULL, "Select one or more models to open", "", "Models (*.obj)");
+    QStringList files = QFileDialog::getOpenFileNames(NULL, "Select one or more models to open", "/home/dani/uni/G/02 - Models", "Models (*.obj)");
     QStringList::Iterator it = files.begin();
     while(it != files.end()) 
     {

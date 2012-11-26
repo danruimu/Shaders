@@ -1,3 +1,5 @@
 export LD_LIBRARY_PATH="/home/dani/uni/G/Shaders/Practica/Viewer/viewer/bin"
+qmake
 make
-./viewer/bin/viewer
+cd ./viewer/bin/
+./viewer
