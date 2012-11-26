@@ -63,5 +63,9 @@ HEADERS	+= include/*.h
 SOURCES	+= src/*.cpp
 FORMS	+= src/principal.ui
 
+LIBS += -L/usr/lib/fglrx/ -lGL
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -lglut
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -lGLU
+
 #message(Working dir: $$PWD)
 #message(Target dir: $$DESTDIR)

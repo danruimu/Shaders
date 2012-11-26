@@ -44,8 +44,6 @@ win32:  LIBS += ../../viewer/bin/pluginglwidget.lib -L../bin/ -lpluginglwidget
 macx: LIBS += -L../../viewer/bin/ -lcore -lGLEW
 macx: LIBS += -L../bin/ -lpluginglwidget
 
-
-
-
-
-
+LIBS += -L/usr/lib/fglrx/ -lGL
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -lglut
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -lGLU
