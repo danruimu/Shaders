@@ -12,8 +12,8 @@ using namespace std;
      Q_INTERFACES(DrawInterface)
 
  private:
-     vector<vector<float> > vertices;
-     vector<vector<float> > normals;
+     vector<vector<Vertex> > vertices;
+     vector<vector<Vertex> > normals;
      vector<vector<int> > indices;
 
  public:
