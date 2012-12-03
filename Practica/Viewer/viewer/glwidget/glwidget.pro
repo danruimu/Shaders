@@ -44,7 +44,6 @@ INSTALLS   += target
 
 DEFINES += PLUGINGLWIDGET_LIBRARY   # see Qt docs, "Creating shared libraries"
 
-LIBS += -L/usr/lib/x86_64-linux-gnu/ -lglut
 LIBS += -L/usr/lib/fglrx/ -lGL
 
 HEADERS += include/*.h 

@@ -2,6 +2,7 @@
 #define _DRAWVAFLAT_H
 
 #include "drawinterface.h"
+#include "vertex.h"
 #include <vector>
 using namespace std;
 
@@ -11,8 +12,8 @@ using namespace std;
      Q_INTERFACES(DrawInterface)
 
  private:
-     vector< vector<float[3]> > va;
-     unsigned int numVA = 0; 
+     vector<float> vertices;
+     vector<float> normals;
 
  public:
      void drawScene();
