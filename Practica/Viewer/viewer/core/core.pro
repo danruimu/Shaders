@@ -8,7 +8,7 @@ QT          += opengl
 
 INCLUDEPATH += include
 
-DESTDIR     = $$(PWD)/../bin
+DESTDIR     = ./../bin
 
 CONFIG(debug, debug|release) {
     TARGET  = $$join(TARGET,,,d)

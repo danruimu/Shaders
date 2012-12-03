@@ -12,7 +12,7 @@ INCLUDEPATH += include
 INCLUDEPATH += ../core/include
 INCLUDEPATH += ../interfaces
 
-DESTDIR = $$(PWD)/../bin
+ESTDIR = ./../bin
 #message("will install in $$DESTDIR")
 
 CONFIG(debug, debug|release) {
