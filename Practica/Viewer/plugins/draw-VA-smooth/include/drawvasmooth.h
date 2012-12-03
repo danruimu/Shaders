@@ -15,6 +15,7 @@ using namespace std;
      vector<vector<Vertex> > vertices;
      vector<vector<Vertex> > normals;
      vector<vector<int> > indices;
+     vector<int> cont;
 
  public:
      void drawScene();
