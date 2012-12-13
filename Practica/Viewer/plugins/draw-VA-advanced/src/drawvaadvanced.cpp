@@ -1,7 +1,7 @@
-#include "drawvasmooth.h"
+#include "drawvaadvanced.h"
 #include "glwidget.h"
 
-void DrawVASmooth::drawScene()
+void DrawVAAdvanced::drawScene()
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -19,7 +19,7 @@ void DrawVASmooth::drawScene()
     glDisableClientState(GL_NORMAL_ARRAY);
 }
 
-void DrawVASmooth::onPluginLoad() {
+void DrawVAAdvanced::onPluginLoad() {
     Scene* scene = pglwidget->scene();
     //Per cada objecte de l'escena
     for(int i = 0; i<scene->objects().size(); ++i) {
@@ -74,7 +74,7 @@ void DrawVASmooth::onPluginLoad() {
     }
 }
 
-void DrawVASmooth::onObjectAdd() {
+void DrawVAAdvanced::onObjectAdd() {
     Scene* scene = pglwidget->scene();
 
     Object obj = scene->objects()[scene->objects().size()-1];
@@ -126,4 +126,4 @@ void DrawVASmooth::onObjectAdd() {
     }
 }
 
-Q_EXPORT_PLUGIN2(drawvasmooth, DrawVASmooth)   // plugin name, plugin class
+Q_EXPORT_PLUGIN2(drawvaadvanced, DrawVAAdvanced)   // plugin name, plugin class
