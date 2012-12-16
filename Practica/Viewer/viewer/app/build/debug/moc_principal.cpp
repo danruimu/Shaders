@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'principal.h'
 **
-** Created: Sun Dec 16 19:09:28 2012
+** Created: Sun Dec 16 19:54:43 2012
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.3)
 **
 ** WARNING! All changes made in this file will be lost!

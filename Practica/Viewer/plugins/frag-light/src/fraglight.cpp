@@ -1,29 +1,27 @@
 #include "fraglight.h"
-#include "glwidget.h"
 
-void FragLight::drawScene()
-{
-    glColor3f(0.8f, 0.8f, 0.8f);
-    Scene* scene = pglwidget->scene();
-    // per cada objecte
-    for (unsigned int i=0; i<scene->objects().size(); ++i)    
-    {
-        const Object& obj = scene->objects()[i];
-        // per cada cara
-        for(unsigned int c=0; c<obj.faces().size(); c++)
-        {
-            const Face& face = obj.faces()[c];
-            glBegin (GL_POLYGON);
-            glNormal3f(face.normal().x(), face.normal().y(), face.normal().z());
-            // per cada vertex
-            for(int v=0; v<face.numVertices(); v++)
-            { 
-                const Point& p = obj.vertices()[face.vertexIndex(v)].coord();
-                glVertex3f(p.x(), p.y(), p.z());
-            }
-            glEnd();
-        }
-    }
+void FragLight::onPluginLoad() {
+    QGLShader vs(QGLShader::Vertex);
+    QGLShader fs(QGLShader::Fragment);
+
+    QString vsFile = QFileDialog::getOpenFileName(NULL, "Select the vertex shader", "/home/dani/uni/G/Shaders/Practica/Viewer/plugins/frag-light/src/", "Vertex Shaders (*.vert)");
+    QString fsFile = QFileDialog::getOpenFileName(NULL, "Select the fragment shader", "/home/dani/uni/G/Shaders/Practica/Viewer/plugins/frag-light/src/", "Fragment Shaders (*.frag)");
+
+    vs.compileSourceFile(vsFile);
+    fs.compileSourceFile(fsFile);
+
+    ShaderProgram.addShader(&vs);
+    ShaderProgram.addShader(&fs);
+
+    ShaderProgram.link();
+}
+
+void FragLight::preFrame() {
+    ShaderProgram.bind();
+}
+
+void FragLight::postFrame() {
+    ShaderProgram.release();
 }
 
 Q_EXPORT_PLUGIN2(fraglight, FragLight)   // plugin name, plugin class
