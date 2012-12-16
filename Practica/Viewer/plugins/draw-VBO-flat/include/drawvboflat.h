@@ -3,6 +3,9 @@
 
 #include "drawinterface.h"
 #include "vertex.h"
+#include "color.h"
+#include "materiallib.h"
+#include "glwidget.h"
 #include <vector>
 using namespace std;
 
@@ -12,9 +15,8 @@ using namespace std;
      Q_INTERFACES(DrawInterface)
 
  private:
-     vector<vector<Vertex> > vertices;
-     vector<vector<Vertex> > normals;
-     vector<vector<int> > indices;
+     vector<GLuint> ids;    //vector de identificadors de VBO, on es guardaen cuartets VNCI de cada objecte
+     vector<int> tamI;
 
  public:
      void drawScene();
@@ -23,5 +25,4 @@ using namespace std;
  };
  
  #endif
- 
  
