@@ -1,60 +1,79 @@
-#include "drawvbosmooth.h"
+#include "drawvboflat.h"
 #include "glwidget.h"
 
-void DrawVBOSmooth::drawScene()
+void DrawVBOFlat::drawScene()
 {
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
+    int j = 0;
+    for(int i = 0; i<ids.size(); ++i) {
+        if(i%4==0) {    //v
+            glEnableClientState(GL_VERTEX_ARRAY);
+            glEnableClientState(GL_NORMAL_ARRAY);
+            glEnableClientState(GL_COLOR_ARRAY);
+            glBindBuffer(GL_ARRAY_BUFFER, ids[i]);
+            glVertexPointer(3, GL_FLOAT, 0, (GLvoid*)0);
+        } else if(i%4==1) { //n
+            glBindBuffer(GL_ARRAY_BUFFER, ids[i]);
+            glNormalPointer(GL_FLOAT, 0, (GLvoid*)0);
+            //glEnableClientState(GL_NORMAL_ARRAY);
+        } else if(i%4==2) { //c
+            glBindBuffer(GL_ARRAY_BUFFER, ids[i]);
+            glColorPointer(4, GL_FLOAT, 0, (GLvoid*)0);
+            //glEnableClientState(GL_COLOR_ARRAY);
+        } else if(i%4==3) { //i
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ids[i]);
+            glDrawElements(GL_TRIANGLES, tamI[j++], GL_UNSIGNED_INT, (GLvoid*)0);
 
-    //Per cada vertex array que tinguem guardat
-    for(int i = 0; i<vertices.size(); ++i) {
-        //Creem el vertex array real
-        glVertexPointer(3, GL_FLOAT, 0, (void *) &vertices[i][0]);
-        glNormalPointer(GL_FLOAT, 0, (void *) &normals[i][0]);
-
-        glDrawElements(GL_TRIANGLES, indices[i].size(), GL_UNSIGNED_INT, (void *) &indices[i][0]);
+            glDisableClientState(GL_VERTEX_ARRAY);
+            glDisableClientState(GL_NORMAL_ARRAY);
+            glDisableClientState(GL_COLOR_ARRAY);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
     }
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
 }
 
-void DrawVBOSmooth::onPluginLoad() {
+void DrawVBOFlat::onPluginLoad() {
     Scene* scene = pglwidget->scene();
+    MaterialLib* matlib = MaterialLib::instance();
     //Per cada objecte de l'escena
     for(int i = 0; i<scene->objects().size(); ++i) {
         Object obj = scene->objects()[i];
-        //Guardem els vertexs de l'objecte a l'ultima posicio de "vertices"
-        vertices.push_back(obj.vertices());
-        //Redimensionem normals, que tindra la mateixa mida que vertices i posem tot a zero
-        normals.push_back(obj.vertices());
-        cont = vector<int>(normals[i].size(), 0);
-        Point p; p.setX(0); p.setY(0); p.setZ(0);
-        for(int j=0; j<normals[i].size(); ++j) normals[i][j].setCoord(p);
-        //Per cada cara mirem a quins vertexs pertany la normal
+        vector<Vertex> v = obj.vertices();
+        vector<Vertex> n = v;
+        vector<Color> c; c.resize(v.size());
         for(int j = 0; j<obj.faces().size(); ++j) {
             Face face = obj.faces()[j];
-            //Per cada vertex de la cara mirem a quina posicio correspont de "vertices" i sumem la normal e incrementem
-            //el vector de contadors
+            Material m = matlib->material(face.materialIndex());
             for(int l = 0; l<face.numVertices(); ++l) {
-                Point q;
-                q.setX(normals[i][face.vertexIndex(l)].coord().x()+face.normal().x());
-                q.setY(normals[i][face.vertexIndex(l)].coord().y()+face.normal().y());
-                q.setZ(normals[i][face.vertexIndex(l)].coord().z()+face.normal().z());
-                normals[i][face.vertexIndex(l)] = q;
-
-                cont[face.vertexIndex(l)]++;
+                n[face.vertexIndex(l)] = face.normal();
+                c[face.vertexIndex(l)] = m.ambient();
             }
         }
+        /* v = array de vertices
+         * n = array de normales de cada vertice
+         * c = array de colores de cada vertice
+         */
+        GLuint auxID[3];
+        glGenBuffers(3, auxID);
+        ids.push_back(auxID[0]);
+        ids.push_back(auxID[1]);
+        ids.push_back(auxID[2]);
+
+        glBindBuffer(GL_ARRAY_BUFFER, auxID[0]);
+        glBufferData(GL_ARRAY_BUFFER, v.size()*sizeof(Vertex), (void*)&v[0],GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, auxID[1]);
+        glBufferData(GL_ARRAY_BUFFER, n.size()*sizeof(Vertex), (void*)&n[0],GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, auxID[2]);
+        glBufferData(GL_ARRAY_BUFFER, c.size()*sizeof(Color), (void*)&c[0],GL_STATIC_DRAW);
+
+        //Ahora falta calcular el vector de Indices
         vector<int> ind;
-        //Per cada cara s'ha de mirar de calcular tots els indexos possibles que tindrem
         for(int j = 0; j<obj.faces().size(); ++j) {
             int first, last, next;
             Face face = obj.faces()[j];
             first = face.vertexIndex(0);
             last = face.vertexIndex(1);
             next = face.vertexIndex(2);
-            //Creem tots el triangles possibles de una cara
             ind.push_back(first); ind.push_back(last); ind.push_back(next);
             for(int l = 3; l<face.numVertices(); ++l) {
                 last = next;
@@ -62,52 +81,57 @@ void DrawVBOSmooth::onPluginLoad() {
                 ind.push_back(first); ind.push_back(last); ind.push_back(next);
             }
         }
-        indices.push_back(ind);
-        //Calculem les noves normals
-        for(int j = 0; j<normals[i].size(); ++j) {
-            Point q;
-            q.setX(normals[i][j].coord().x()/cont[j]);
-            q.setY(normals[i][j].coord().y()/cont[j]);
-            q.setZ(normals[i][j].coord().z()/cont[j]);
-            normals[i][j] = q;
-        }
+        /* ind = array de indices */
+        GLuint auxID2[1];
+        glGenBuffers(1, auxID2);
+        ids.push_back(auxID2[0]);
+        tamI.push_back(ind.size());
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, auxID2[0]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind.size()*sizeof(int), (void*)&ind[0], GL_STATIC_DRAW);
     }
 }
 
-void DrawVBOSmooth::onObjectAdd() {
+void DrawVBOFlat::onObjectAdd() {
     Scene* scene = pglwidget->scene();
-
+    MaterialLib* matlib = MaterialLib::instance();
     Object obj = scene->objects()[scene->objects().size()-1];
-    //Guardem els vertexs de l'objecte a l'ultima posicio de "vertices"
-    vertices.push_back(obj.vertices());
-    //Redimensionem normals, que tindra la mateixa mida que vertices i posem tot a zero
-    normals.push_back(obj.vertices());
-    cont = vector<int>(normals[scene->objects().size()-1].size(), 0);
-    Point p; p.setX(0); p.setY(0); p.setZ(0);
-    for(int j=0; j<normals[scene->objects().size()-1].size(); ++j) normals[scene->objects().size()-1][j].setCoord(p);
-    //Per cada cara mirem a quins vertexs pertany la normal
+    vector<Vertex> v = obj.vertices();
+    vector<Vertex> n = v;
+    vector<Color> c; c.resize(v.size());
     for(int j = 0; j<obj.faces().size(); ++j) {
         Face face = obj.faces()[j];
-        //Per cada vertex de la cara mirem a quina posicio correspont de "vertices" i sumem la normal e incrementem
-        //el vector de contadors
+        Material m = matlib->material(face.materialIndex());
         for(int l = 0; l<face.numVertices(); ++l) {
-            Point q;
-            q.setX(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().x()+face.normal().x());
-            q.setY(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().y()+face.normal().y());
-            q.setZ(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().z()+face.normal().z());
-            normals[scene->objects().size()-1][face.vertexIndex(l)] = q;
-            cont[face.vertexIndex(l)]++;
+            n[face.vertexIndex(l)] = face.normal();
+            c[face.vertexIndex(l)] = m.ambient();
         }
     }
+    /* v = array de vertices
+     * n = array de normales de cada vertice
+     * c = array de colores de cada vertice
+     */
+    GLuint auxID[3];
+    glGenBuffers(3, auxID);
+    ids.push_back(auxID[0]);
+    ids.push_back(auxID[1]);
+    ids.push_back(auxID[2]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, auxID[0]);
+    glBufferData(GL_ARRAY_BUFFER, v.size()*sizeof(Vertex), (void*)&v[0],GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, auxID[1]);
+    glBufferData(GL_ARRAY_BUFFER, n.size()*sizeof(Vertex), (void*)&n[0],GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, auxID[2]);
+    glBufferData(GL_ARRAY_BUFFER, c.size()*sizeof(Color), (void*)&c[0],GL_STATIC_DRAW);
+
+    //Ahora falta calcular el vector de Indices
     vector<int> ind;
-    //Per cada cara s'ha de mirar de calcular tots els indexos possibles que tindrem
     for(int j = 0; j<obj.faces().size(); ++j) {
         int first, last, next;
         Face face = obj.faces()[j];
         first = face.vertexIndex(0);
         last = face.vertexIndex(1);
         next = face.vertexIndex(2);
-        //Creem tots el triangles possibles de una cara
         ind.push_back(first); ind.push_back(last); ind.push_back(next);
         for(int l = 3; l<face.numVertices(); ++l) {
             last = next;
@@ -115,15 +139,14 @@ void DrawVBOSmooth::onObjectAdd() {
             ind.push_back(first); ind.push_back(last); ind.push_back(next);
         }
     }
-    indices.push_back(ind);
-    //Calculem les noves normals
-    for(int j = 0; j<normals[scene->objects().size()-1].size(); ++j) {
-        Point q;
-        q.setX(normals[scene->objects().size()-1][j].coord().x()/cont[j]);
-        q.setY(normals[scene->objects().size()-1][j].coord().y()/cont[j]);
-        q.setZ(normals[scene->objects().size()-1][j].coord().z()/cont[j]);
-        normals[scene->objects().size()-1][j] = q;
-    }
+    /* ind = array de indices */
+    GLuint auxID2[1];
+    glGenBuffers(1, auxID2);
+    ids.push_back(auxID2[0]);
+    tamI.push_back(ind.size());
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, auxID2[0]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind.size()*sizeof(int), (void*)&ind[0], GL_STATIC_DRAW);
 }
 
-Q_EXPORT_PLUGIN2(drawvbosmooth, DrawVBOSmooth)   // plugin name, plugin class
+Q_EXPORT_PLUGIN2(drawvboflat, DrawVBOFlat)   // plugin name, plugin class
