@@ -3,6 +3,8 @@
 
 #include "drawinterface.h"
 #include "vertex.h"
+#include "color.h"
+#include "materiallib.h"
 #include <vector>
 using namespace std;
 
@@ -14,6 +16,7 @@ using namespace std;
  private:
      vector<vector<Vertex> > vertices;
      vector<vector<Vertex> > normals;
+     vector<vector<Color> > colors;
      vector<vector<int> > indices;
 
  public:

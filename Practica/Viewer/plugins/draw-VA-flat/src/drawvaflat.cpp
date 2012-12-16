@@ -11,6 +11,7 @@ void DrawVAFlat::drawScene()
         //Creem el vertex array real
         glVertexPointer(3, GL_FLOAT, 0, (void *) &vertices[i][0]);
         glNormalPointer(GL_FLOAT, 0, (void *) &normals[i][0]);
+        glColorPointer(3, GL_FLOAT, 0, (void *) &colors[i][0]);
 
         glDrawElements(GL_TRIANGLES, indices[i].size(), GL_UNSIGNED_INT, (void *) &indices[i][0]);
     }
@@ -21,6 +22,7 @@ void DrawVAFlat::drawScene()
 
 void DrawVAFlat::onPluginLoad() {
     Scene* scene = pglwidget->scene();
+    MaterialLib* matlib = MaterialLib::instance();
     //Per cada objecte de l'escena
     for(int i = 0; i<scene->objects().size(); ++i) {
         Object obj = scene->objects()[i];
@@ -28,12 +30,16 @@ void DrawVAFlat::onPluginLoad() {
         vertices.push_back(obj.vertices());
         //Redimensionem normals, que tindra la mateixa mida que vertices
         normals.push_back(obj.vertices());
-        //Per cada cara mirem a quins vertexs pertany la normal
+        vector<Color> aux(normals[i].size());
+        colors.push_back(aux);
+        //Per cada cara mirem a quins vertexs pertany la normal i el color de la cara
         for(int j = 0; j<obj.faces().size(); ++j) {
             Face face = obj.faces()[j];
+            Material m = matlib->material(face.materialIndex());
             //Per cada vertex de la cara mirem a quina posicio correspont de "vertices"
             for(int l = 0; l<face.numVertices(); ++l) {
                 normals[i][face.vertexIndex(l)] = face.normal();
+                colors[i][face.vertexIndex(l)] = m.ambient();
             }
         }
         vector<int> ind;
@@ -58,18 +64,22 @@ void DrawVAFlat::onPluginLoad() {
 
 void DrawVAFlat::onObjectAdd() {
     Scene* scene = pglwidget->scene();
-
+    MaterialLib* matlib = MaterialLib::instance();
     Object obj = scene->objects()[scene->objects().size()-1];
     //Guardem els vertexs de l'objecte a l'ultima posicio de "vertices"
     vertices.push_back(obj.vertices());
     //Redimensionem normals, que tindra la mateixa mida que vertices
     normals.push_back(obj.vertices());
+    vector<Color> aux(normals[scene->objects().size()-1].size());
+    colors.push_back(aux);
     //Per cada cara mirem a quins vertexs pertany la normal
     for(int j = 0; j<obj.faces().size(); ++j) {
         Face face = obj.faces()[j];
+        Material m = matlib->material(face.materialIndex());
         //Per cada vertex de la cara mirem a quina posicio correspont de "vertices"
         for(int l = 0; l<face.numVertices(); ++l) {
             normals[scene->objects().size()-1][face.vertexIndex(l)] = face.normal();
+            colors[scene->objects().size()-1][face.vertexIndex(l)] = m.ambient();
         }
     }
     vector<int> ind;
