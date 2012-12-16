@@ -3,6 +3,9 @@
 
 #include "drawinterface.h"
 #include "vertex.h"
+#include "color.h"
+#include "materiallib.h"
+#include "glwidget.h"
 #include <vector>
 using namespace std;
 

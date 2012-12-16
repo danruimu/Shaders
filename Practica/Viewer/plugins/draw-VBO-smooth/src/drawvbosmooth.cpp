@@ -1,7 +1,7 @@
-#include "drawvboflat.h"
+#include "drawvbosmooth.h"
 #include "glwidget.h"
 
-void DrawVBOFlat::drawScene()
+void DrawVBOSmooth::drawScene()
 {
     int j = 0;
     for(int i = 0; i<ids.size(); ++i) {
@@ -32,7 +32,7 @@ void DrawVBOFlat::drawScene()
     }
 }
 
-void DrawVBOFlat::onPluginLoad() {
+void DrawVBOSmooth::onPluginLoad() {
     Scene* scene = pglwidget->scene();
     MaterialLib* matlib = MaterialLib::instance();
     //Per cada objecte de l'escena
@@ -40,14 +40,30 @@ void DrawVBOFlat::onPluginLoad() {
         Object obj = scene->objects()[i];
         vector<Vertex> v = obj.vertices();
         vector<Vertex> n = v;
+        Point q; q.setX(0); q.setY(0); q.setZ(0);
+        for(int a = 0; a<n.size(); ++a) {
+            n[a].setCoord(q);
+        }
+        vector<int> cont(n.size(),0);
         vector<Color> c; c.resize(v.size());
         for(int j = 0; j<obj.faces().size(); ++j) {
             Face face = obj.faces()[j];
             Material m = matlib->material(face.materialIndex());
             for(int l = 0; l<face.numVertices(); ++l) {
-                n[face.vertexIndex(l)] = face.normal();
+                q.setX(n[face.vertexIndex(l)].coord().x()+face.normal().x());
+                q.setY(n[face.vertexIndex(l)].coord().y()+face.normal().y());
+                q.setZ(n[face.vertexIndex(l)].coord().z()+face.normal().z());
+                n[face.vertexIndex(l)].setCoord(q);
+                ++cont[face.vertexIndex(l)];
+
                 c[face.vertexIndex(l)] = m.ambient();
             }
+        }
+        for(int j = 0; j<n.size(); ++j) {
+            q.setX(n[j].coord().x()/cont[j]);
+            q.setY(n[j].coord().y()/cont[j]);
+            q.setZ(n[j].coord().z()/cont[j]);
+            n[j].setCoord(q);
         }
         /* v = array de vertices
          * n = array de normales de cada vertice
@@ -92,20 +108,36 @@ void DrawVBOFlat::onPluginLoad() {
     }
 }
 
-void DrawVBOFlat::onObjectAdd() {
+void DrawVBOSmooth::onObjectAdd() {
     Scene* scene = pglwidget->scene();
     MaterialLib* matlib = MaterialLib::instance();
     Object obj = scene->objects()[scene->objects().size()-1];
     vector<Vertex> v = obj.vertices();
     vector<Vertex> n = v;
+    Point q; q.setX(0); q.setY(0); q.setZ(0);
+    for(int a = 0; a<n.size(); ++a) {
+        n[a].setCoord(q);
+    }
+    vector<int> cont(n.size(),0);
     vector<Color> c; c.resize(v.size());
     for(int j = 0; j<obj.faces().size(); ++j) {
         Face face = obj.faces()[j];
         Material m = matlib->material(face.materialIndex());
         for(int l = 0; l<face.numVertices(); ++l) {
-            n[face.vertexIndex(l)] = face.normal();
+            q.setX(n[face.vertexIndex(l)].coord().x()+face.normal().x());
+            q.setY(n[face.vertexIndex(l)].coord().y()+face.normal().y());
+            q.setZ(n[face.vertexIndex(l)].coord().z()+face.normal().z());
+            n[face.vertexIndex(l)].setCoord(q);
+            ++cont[face.vertexIndex(l)];
+
             c[face.vertexIndex(l)] = m.ambient();
         }
+    }
+    for(int j = 0; j<n.size(); ++j) {
+        q.setX(n[j].coord().x()/cont[j]);
+        q.setY(n[j].coord().y()/cont[j]);
+        q.setZ(n[j].coord().z()/cont[j]);
+        n[j].setCoord(q);
     }
     /* v = array de vertices
      * n = array de normales de cada vertice
@@ -149,4 +181,4 @@ void DrawVBOFlat::onObjectAdd() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind.size()*sizeof(int), (void*)&ind[0], GL_STATIC_DRAW);
 }
 
-Q_EXPORT_PLUGIN2(drawvboflat, DrawVBOFlat)   // plugin name, plugin class
+Q_EXPORT_PLUGIN2(drawvbosmooth, DrawVBOSmooth)   // plugin name, plugin class
