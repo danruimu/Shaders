@@ -93,8 +93,8 @@ void DrawVASmooth::onObjectAdd() {
         for(int l = 0; l<face.numVertices(); ++l) {
             Point q;
             q.setX(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().x()+face.normal().x());
-            q.setX(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().y()+face.normal().y());
-            q.setX(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().z()+face.normal().z());
+            q.setY(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().y()+face.normal().y());
+            q.setZ(normals[scene->objects().size()-1][face.vertexIndex(l)].coord().z()+face.normal().z());
             normals[scene->objects().size()-1][face.vertexIndex(l)] = q;
             cont[face.vertexIndex(l)]++;
         }
