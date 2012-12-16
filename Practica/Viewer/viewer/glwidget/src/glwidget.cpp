@@ -84,7 +84,7 @@ void GLWidget::resizeGL (int width, int height)
 void GLWidget::loadPlugin()
 {
     // TO DO: canviar extensió segons OS
-    QStringList list = QFileDialog::getOpenFileNames(NULL, "Select one or more plugins to open", "/home/dani/uni/G/Shaders/Practica/Viewer/plugins/bin", "Plugins (*.so)");
+    QStringList list = QFileDialog::getOpenFileNames(NULL, "Select one or more plugins to open", "/home/dani/uni/G/Shaders/Practica/Viewer/plugins", "Plugins (*.so)");
     QStringList::Iterator it = list.begin();
     while(it != list.end()) 
     {

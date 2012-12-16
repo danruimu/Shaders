@@ -9,19 +9,10 @@ class ObjSel : public QObject, public ActionInterface
      Q_INTERFACES(ActionInterface)
 
  public:
-    ObjSel();
- 
-    void	keyPressEvent ( QKeyEvent *  ) {};
-    void	keyReleaseEvent ( QKeyEvent *  ) {};
-    
-    void	mouseMoveEvent ( QMouseEvent * event );
-    void	mousePressEvent ( QMouseEvent * event );
-    void	mouseReleaseEvent ( QMouseEvent * event );
-    void	wheelEvent ( QWheelEvent *  ) {};
+    void mouseReleaseEvent ( QMouseEvent * event );
  
  private:
-    typedef  enum {NONE, ROTATE, ZOOM, PAN} MouseAction;
-    MouseAction pmouseAction;
+    void pintaEscenaConColores();
     int   pxClick, pyClick;
  };
  
